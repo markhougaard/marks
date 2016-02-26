@@ -1,6 +1,4 @@
 .DS_Store
 build
 node_modules
-src/assets/scss/**
-src/content/**
 npm-debug.log
