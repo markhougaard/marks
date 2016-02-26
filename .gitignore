@@ -1,5 +1,5 @@
 .DS_Store
 build
 node_modules
-*.scss
-*.jade
+src/assets/scss/*.scss
+src/content/*.jade
