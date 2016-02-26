@@ -1,33 +1,31 @@
-// Gulp plugins
-var gulp            = require('gulp'),
-    sass            = require('gulp-sass'),
-    jade            = require('gulp-jade'),
-    del             = require('del'),
-    express         = require('express'),
+// Gulp and Node plugins
+var gulp            = require('gulp'), // We need Gulp itself to perform Gulp tasks
+    sass            = require('gulp-sass'), // gulp-sass will let us compile scss-files to css
+    jade            = require('gulp-jade'), // gulp-jade is our template language of choice
+    del             = require('del'), // del is used instead of gulp-clean so the build folder will be wiped
+    express         = require('express'), // express is a great little server we use to watch our files
     app             = express(),
-    tinylr          = require('tiny-lr')();
+    tinylr          = require('tiny-lr')(); // tinylr is a neat little way to live-reload changes so we can watch our styles and templates update in real-time
 
-ASSETS_DIR = 'src/assets',
-SCSS_DIR = 'src/assets/scss',
-JS_DIR = 'src/assets/js',
-BUILD_DIR = 'build',
-CONTENT_DIR = 'src/content',
-IMG_DIR = 'src/img';
+// Define the variables for locating our stuff
+SCSS_DIR = 'src/assets/scss', // This is where the SASS-files go
+BUILD_DIR = 'build', // This is the folder we output the compiled files to
+CONTENT_DIR = 'src/content'; // This is where we keep the templates with content
 
-EXPRESS_ROOT = BUILD_DIR;
-EXPRESS_PORT = 3000;
-LIVERELOAD_PORT = 35729;
+EXPRESS_ROOT = BUILD_DIR; // For our express-server, we need to know where the 'root' is, and by making it the same as the BUILD_DIR, we can serve it at http://localhost:3000/ instead of http://localhost:3000/build
+EXPRESS_PORT = 3000; // The port we will use to serve the files. This should not conflict with anything else you're running currently
+LIVERELOAD_PORT = 35729; // The default port for live-reload
 
 // Start an Express-server
-gulp.task('express', function() {
-    app.use(require('connect-livereload')({port: LIVERELOAD_PORT}));
-    app.use(express.static(EXPRESS_ROOT));
-    app.listen(EXPRESS_PORT, '0.0.0.0');
+gulp.task('express', function() { // Define a task called 'express'
+    app.use(require('connect-livereload')({port: LIVERELOAD_PORT})); // Our express app uses connect-reload to match the express-server with live-reload on the LIVERELOAD_PORT
+    app.use(express.static(EXPRESS_ROOT)); // Defining the location for where the express-server will serve the static files from
+    app.listen(EXPRESS_PORT, '0.0.0.0'); // Where can we listen to the express-server? At 'http://0.0.0.0' i.e. 'http://localhost' on the port defined in EXPRESS_PORT, i.e. 3000
 });
 
 // Enable livereload without browser plugin
-gulp.task('livereload', function() {
-    tinylr.listen(LIVERELOAD_PORT);
+gulp.task('livereload', function() { // We name the task appropriately 'livereload'
+    tinylr.listen(LIVERELOAD_PORT); // Tinylr should listen on this port
 });
 
 function notifyLiveReload(event) {
