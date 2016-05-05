@@ -1,7 +1,7 @@
 // Gulp and Node plugins
 var gulp            = require('gulp'), // We need Gulp itself to perform Gulp tasks
     sass            = require('gulp-sass'), // gulp-sass will let us compile scss-files to css
-    jade            = require('gulp-jade'), // gulp-jade is our template language of choice
+    pug             = require('gulp-pug'), // gulp-pug is our template language of choice
     del             = require('del'), // del is used instead of gulp-clean so the build folder will be wiped
     express         = require('express'), // express is a great little server we use to watch our files
     app             = express(),
@@ -43,27 +43,27 @@ gulp.task('clean', function(cb) {
     del([BUILD_DIR], cb);
 });
 
-// Compile SASS and Jade
+// Compile SASS and pug
 gulp.task('compile-sass', function() {
     return gulp.src(SCSS_DIR + '/style.scss')
         .pipe(sass({ outputStyle: 'compressed', errLogToConsole: false, includePaths: [SCSS_DIR] }))
         .pipe(gulp.dest(BUILD_DIR))
 });
 
-gulp.task('compile-jade', function() {
-    return gulp.src(CONTENT_DIR + '/*.jade')
-        .pipe(jade({ pretty: true }))
+gulp.task('compile-pug', function() {
+    return gulp.src(CONTENT_DIR + '/*.pug')
+        .pipe(pug({ pretty: true }))
         .pipe(gulp.dest(BUILD_DIR))
 });
 
 // Build
-gulp.task('build', ['compile-sass', 'compile-jade'], function(cb) {
+gulp.task('build', ['compile-sass', 'compile-pug'], function(cb) {
     cb();
 });
 
 // Watch
-gulp.task('watch', ['express', 'compile-sass', 'compile-jade', 'livereload'], function(cb){
+gulp.task('watch', ['express', 'compile-sass', 'compile-pug', 'livereload'], function(cb){
     gulp.watch(SCSS_DIR + '/**', ['compile-sass']);
-    gulp.watch(CONTENT_DIR + '/*.jade', ['compile-jade']);
+    gulp.watch(CONTENT_DIR + '/*.pug', ['compile-pug']);
     gulp.watch(BUILD_DIR + '/**', notifyLiveReload);
 });
