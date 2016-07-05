@@ -2,8 +2,10 @@
 var gulp            = require('gulp'), // We need Gulp itself to perform Gulp tasks
     sass            = require('gulp-sass'), // gulp-sass will let us compile scss-files to css
     pug             = require('gulp-pug'), // gulp-pug is our template language of choice
+    awspublish      = require('gulp-awspublish'), // gulp-awspublish enables deployments to AWS S3
     del             = require('del'), // del is used instead of gulp-clean so the build folder will be wiped
     express         = require('express'), // express is a great little server we use to watch our files
+    fs              = require('fs'), // fs lets us read the file system
     app             = express(),
     tinylr          = require('tiny-lr')(); // tinylr is a neat little way to live-reload changes so we can watch our styles and templates update in real-time
 
@@ -66,4 +68,32 @@ gulp.task('watch', ['express', 'compile-sass', 'compile-pug', 'livereload'], fun
     gulp.watch(SCSS_DIR + '/**', ['compile-sass']);
     gulp.watch(CONTENT_DIR + '/*.pug', ['compile-pug']);
     gulp.watch(BUILD_DIR + '/**', notifyLiveReload);
+});
+
+// Deploy
+var awspublish = require('gulp-awspublish');
+
+gulp.task('deploy', ['build'], function() {
+
+    // Read the settings from their own file
+    awsoptions = JSON.parse(fs.readFileSync('aws.json'));
+
+    // Read those settings
+    var publisher = awspublish.create(awsoptions);
+
+    // Define the cache
+    var headers = {
+        'Cache-Control': 'max-age=315360000, no-transform, public'
+    };
+
+    return gulp.src(BUILD_DIR + '/**')
+
+        // Add cache headers
+        .pipe(publisher.publish(headers))
+
+        // Check cache file for changes to avoid unnecessary uploads
+        .pipe(publisher.cache())
+
+        // Tell what's going on
+        .pipe(awspublish.reporter());
 });
